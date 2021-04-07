@@ -2,6 +2,7 @@
 var _ = require('lodash');
 
 var INET = 'inet';
+var INET6 = 'inet6';
 var BCAST = 'Bcast';
 
 module.exports = function (cp) {
@@ -32,7 +33,7 @@ module.exports = function (cp) {
 };
 
 function parse(ifConfigOut, routeOut) {
-  return ifConfigOut.split('\n\n').map(function (inface) {
+  return ifConfigOut.split('\n\n').filter(inface => !inface.includes(INET6) && inface).map(function (inface) {
     var lines = inface.split('\n');
 
     /**
