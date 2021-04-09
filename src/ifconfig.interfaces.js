@@ -33,7 +33,7 @@ module.exports = function (cp) {
 };
 
 function parse(ifConfigOut, routeOut) {
-  return ifConfigOut.split('\n\n').filter(inface => !inface.includes(INET6) && inface).map(function (inface) {
+  return ifConfigOut.split('\n\n').map(function (inface) {
     var lines = inface.split('\n');
 
     /**
@@ -44,16 +44,21 @@ function parse(ifConfigOut, routeOut) {
      * Format 1
      * inet xx:xxx.xxx.xxx.xxx mask|masque|...:xxx.xxx.xxx.xxx
      */
-
-    return {
-      name: getInterfaceName(_.first(lines)),
-      ip: getInterfaceIpAddr(lines[1]),
-      netmask: getInterfaceNetmaskAddr(lines[1]),
-      broadcast: getBroadcastAddr(lines[1]),
-      mac: getInterfaceMacAddr(inface),
-      gateway: getGateway(routeOut)
-    };
-  });
+    let data;
+    try {
+      data = {
+        name: getInterfaceName(_.first(lines)),
+        ip: getInterfaceIpAddr(lines[1]),
+        netmask: getInterfaceNetmaskAddr(lines[1]),
+        broadcast: getBroadcastAddr(lines[1]),
+        mac: getInterfaceMacAddr(inface),
+        gateway: getGateway(routeOut)
+      };
+    } catch {
+      data = null;
+    }
+    return data;
+  }).filter(d => d);
 }
 
 function getInterfaceName(firstLine) {
